@@ -77,9 +77,7 @@ def closed_loop( c, p, tm=5000 ):
     returns: tuple of sequences (times, targets, errors)
     """
     def setpoint( t ):
-        if t < 100: return 0
-        if t < 300: return 50
-        return 10
+        return int(tm*(t/(1.0*tm)))
     
     y = 0
     res = []
@@ -96,7 +94,7 @@ def closed_loop( c, p, tm=5000 ):
 
 # ============================================================
 
-c = Controller( 1.25, 0.01 )
+c = Controller( 1.25, 0.00 )
 p = Buffer( 50, 10 )
 
 # run the simulation

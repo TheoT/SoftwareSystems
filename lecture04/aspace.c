@@ -10,6 +10,11 @@ License: GNU GPLv3
 
 int global;
 
+int local_func(){
+    int *loc;
+    malloc(loc,128);
+    printf("%p\n", &loc);
+}
 int main ()
 {
     int local = 5;
@@ -20,5 +25,6 @@ int main ()
     printf ("Address of local is %p\n", &local);
     printf ("Address of p is %p\n", p);
     
+    local_func();
     return 0;
 }
