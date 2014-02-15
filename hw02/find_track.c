@@ -69,6 +69,8 @@ void find_track_regex(char pattern[])
         printf("No match found\n");
     }
 
+    regfree(&regex)
+
 }
 
 // Truncates the string at the first newline, if there is one.
