@@ -18,9 +18,37 @@ License: Creative Commons Attribution-ShareAlike 3.0
 
 char *center(char *s, int n, char fillchar)
 {
-    // FILL THIS IN
-    //    return NULL;
-}
+    if (n<0){
+        fprintf(stderr, "Desired string length is less than 0\n");
+        exit(1);
+    }
+    char *res = (char*) malloc(n+1);
+    char *buff;
+    buff=res; // use this buffer to step through our return string
+    
+    // figure out how many fillchars we need before/after
+    int s_len=strlen(s);
+    int fill_num = n-s_len;
+    int prior = fill_num/2; // integer division is intended
+    
+    // fill before string
+    int i;
+    for (i=0;i<prior;i++){
+        *buff = fillchar;
+        buff+=1;
+    }
+
+    // copy string into the middle
+    strcpy(buff,s);
+
+    // fill in after string
+    buff+=s_len;
+    for (i=0;i<(fill_num-prior);i++){
+        *buff = fillchar;
+        buff+=1;
+    }
+    return res;
+}   
 
 
 int main (int argc, char *argv[])
