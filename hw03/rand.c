@@ -92,10 +92,10 @@ double my_random_double()
   long x;
   int mant;
   long exp = 1022;
-  int mask = 1;
+  long mask = 1;
 
   union {
-    float f;
+    double f;
     long i;
   } b;
 
@@ -118,7 +118,6 @@ double my_random_double()
   // use the remaining bit as the mexpantissa
   mant = x >> 11;
   b.i = (exp << 52) | mant;
-
   return b.f;
 }
 
