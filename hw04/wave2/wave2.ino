@@ -32,12 +32,15 @@ void setup() {
   pinMode(9, OUTPUT);  
   pinMode(8, OUTPUT);  
   pinMode(7, OUTPUT);  
-  pinMode(6, OUTPUT);  
+  pinMode(6, OUTPUT);
+    
 }
 
 void writeByte(int x) {
   int pin;
-  
+  x = ~x;
+  PORTD = (x<<6) & B00000011;   
+  PORTB = x>>2;   // turns on 13,12,11; turns off 10,9,8
   for (pin=13; pin>=6; pin--) {
     digitalWrite(pin, x&1);
     x >>= 1;
@@ -51,8 +54,9 @@ int counter = low;
 
 void loop() {
   int button1 = digitalRead(buttonPin1);
-  if (button1) return;
-  
+  if (button1){ 
+    return;
+  }
   counter += stride;
   if (counter > high) {
     counter = low;
