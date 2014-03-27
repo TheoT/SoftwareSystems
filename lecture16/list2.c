@@ -108,6 +108,8 @@ void reverse(Node **head) {
 // Returns 0 if successful, -1 if the index is out of range.
 int insert_by_index(Node **head, int val, int index) {
     Node *current = *head;
+	// AFTER TIME RAN OUT NOTE: this is missing special cases, and 
+	// the while loop should be while((index-1)>0)
 	while(index>0){
 		if(current->next==NULL){
 			printf("index out of bounds");
