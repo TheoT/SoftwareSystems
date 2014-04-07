@@ -1,6 +1,6 @@
 /* Example code for Software Systems at Olin College.
 
-Copyright 2014 Allen Downey
+Copyright 2012 Allen Downey
 License: Creative Commons Attribution-ShareAlike 3.0
 
 */
@@ -47,7 +47,7 @@ Value *make_string_value(char *s)
 void print_value (Value *value) 
 {
     if (value == NULL) {
-        printf ("%p", value);
+	printf ("%p", value);
 	return;
     }
     switch (value->type) {
@@ -140,15 +140,20 @@ int equal_int (void *ip, void *jp)
 /* Compares strings. */
 int equal_string (void *s1, void *s2)
 {
-    return (strcmp((char *) s1, (char *) s2)==0);
+    int x = strcmp ((char *) s1, (char *) s2);
+    return (x == 0);
 }
 
 
 /* Compares Hashables. */
 int equal_hashable(Hashable *h1, Hashable *h2)
 {
-    printf("h***%i***\n", h1->equal((void *) h1->key, (void *) h2->key));
-    return h1->equal((void *) h1->key, (void *) h2->key);
+    /* if they don't have the same equal method,
+       they are not the same type */
+    if (h1->equal != h2->equal) return 0;
+
+    /* use the equal method to compare keys */
+    return h1->equal(h1->key, h2->key);
 }
 
 
@@ -187,12 +192,11 @@ typedef struct node {
 /* Makes a Node. */
 Node *make_node(Hashable *key, Value *value, Node *next)
 {
-    Node *node = (Node *) malloc(sizeof(Node));
+    Node *node = (Node *) malloc (sizeof (Node));
     node->key = key;
     node->value = value;
     node->next = next;
     return node;
-
 }
 
 
@@ -208,17 +212,12 @@ void print_node(Node *node)
 /* Prints all the Nodes in a list. */
 void print_list(Node *node)
 {
-    printf("\nPrinting list\n");
-    if (!node){
-        printf("empty list\n");
-        return;
+    if (node == NULL) {
+	return;
     }
-    Node *list_ind = node;
-    while(list_ind){
-        print_node(list_ind);
-        list_ind = list_ind->next;
-    }
-    printf("\n");
+    print_hashable(node->key);
+    printf ("value %p\n", node->value);
+    print_list(node->next);
 }
 
 
@@ -235,19 +234,18 @@ Node *prepend(Hashable *key, Value *value, Node *rest)
 /* Looks up a key and returns the corresponding value, or NULL */
 Value *list_lookup(Node *list, Hashable *key)
 {
+    Node *node;
 
-    Node *list_ind = list;
-    do{
-        if (key->equal(list_ind->key->key,key->key)){
-            return list_ind->value;
-        }
-        list_ind = list_ind->next;
-    } while (list_ind);
+    for (node = list; node != NULL; node = node->next) {
+	if (equal_hashable(key, node->key)) {
+	    return node->value;
+	}
+    }
     return NULL;
 }
 
 
-// MAP: a map is a list of key-value pairs
+// MAP: a map in a list of key-value pairs
 
 typedef struct map {
     int n;
@@ -258,9 +256,14 @@ typedef struct map {
 /* Makes a Map with n lists. */
 Map *make_map(int n)
 {
-    Map *map = (Map *) malloc(sizeof(Map));
+    int i;
+
+    Map *map = (Map *) malloc (sizeof (Map));
     map->n = n;
-    map->lists = (Node **) malloc(sizeof(Node)*n);
+    map->lists = (Node **) malloc (sizeof (Node *) * n);
+    for (i=0; i<n; i++) {
+	map->lists[i] = NULL;
+    }
     return map;
 }
 
@@ -282,17 +285,20 @@ void print_map(Map *map)
 /* Adds a key-value pair to a map. */
 void map_add(Map *map, Hashable *key, Value *value)
 {
-    int map_ind = key->hash(key->key) % map->n;
-    map->lists[map_ind] = prepend(key, value,map->lists[map_ind]);
-    print_node(map->lists[map_ind]);
+    int hashval = hash_hashable(key) % map->n;
+    Node *list = map->lists[hashval];
+    
+    map->lists[hashval] = prepend(key, value, list);
 }
 
 
 /* Looks up a key and returns the corresponding value, or NULL. */
 Value *map_lookup(Map *map, Hashable *key)
 {
-    int map_ind = key->hash(key->key) % map->n;
-    return list_lookup(map->lists[map_ind],key);
+    int hashval = hash_hashable(key) % map->n;
+    Node *list = map->lists[hashval];
+    
+    return list_lookup(list, key);
 }
 
 
