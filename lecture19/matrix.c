@@ -18,8 +18,18 @@ typedef struct {
 
 // Makes a new matrix and sets all elements to zero.
 Matrix *make_matrix(int rows, int cols) {
-    // Fill this in
-    return NULL;
+    Matrix *mat = (Matrix *) malloc(sizeof(Matrix));
+    mat->rows = rows;
+    mat->cols = cols;
+    
+    double** row_arr;
+    row_arr = (double **) calloc(rows, sizeof(double *));
+    int i;
+    for(i=0;i<rows;i++){
+        *row_arr[i] = (double *) calloc(cols, sizeof(double));
+    }
+    return mat;
+
 }
 
 // Prints the elements of a matrix.
