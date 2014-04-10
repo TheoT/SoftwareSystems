@@ -154,20 +154,60 @@ double *row_sum(Matrix *A) {
     }
     return res;
 }
+// Adds up the cols of A and returns a heap-allocated array of doubles.
+double *col_sum(Matrix *A) {
+    double total;
+    int i, j;
+
+    double *res = malloc(A->cols * sizeof(double));
+
+    for (i=0; i<A->cols; i++) {
+    total = 0.0;
+    for (j=0; j<A->rows; j++) {
+        total += A->data[j][i];
+    }
+    res[i] = total;
+    }
+    return res;
+}
 
 /* 
-   http://en.wikipedia.org/wiki/Magic_square
-
-   A magic square is an arrangement of numbers (usually integers) in a
-   square grid, where the numbers in each row, and in each column, and
-   the numbers in the forward and backward main diagonals, all add up
-   to the same number. 
-
-   Write a function called is_magic_square() that takes a matrix and 
-   returns an int, 1 if the matrix is a magic square, and 0 otherwise.
-
-   Feel free to use row_sum().
+   This function returns 1 if Matrix A is a "magic square", and 
+   returns 0 otherwise.
 */
+int is_magic_square(Matrix *A){
+    // if not a square matrix, not magic
+    if(A->rows != A->cols){
+        return 0;
+    }
+
+    int n,M;
+    n = A->rows;
+    M = .5 * n * (n*n + 1); //"magic" factor
+    
+    // sum cols and rows
+    double *rowsum, *colsum;
+    rowsum = row_sum(A);
+    colsum = col_sum(A);
+
+    // sum front and back diagonal
+    int front_diag_sum, rev_diag_sum;
+    front_diag_sum = 0;
+    rev_diag_sum = 0;
+
+    int i;
+    for(i=0;i<n;i++){
+        if(rowsum[i]!=M || colsum[i]!=M){
+            return 0;
+        }  
+        front_diag_sum += A->data[i][i];
+        rev_diag_sum += A->data[n-i-1][n-i-1];
+    }
+    if(front_diag_sum != M || rev_diag_sum != M){
+        return 0;
+    }
+    return 1;
+}
 
 
 int main() {
@@ -201,7 +241,23 @@ int main() {
     for (i=0; i<A->rows; i++) {
 	printf("row %d\t%lf\n", i, sums[i]);
     }
-    // should print 6, 22, 38
 
+    Matrix *E = make_matrix(3, 3);
+    consecutive_matrix(E);
+    printf("E\n");
+    E->data[0][0]=2;
+    E->data[0][1]=7;
+    E->data[0][2]=6;
+    E->data[1][0]=9;
+    E->data[1][1]=5;
+    E->data[1][2]=1;
+    E->data[2][0]=4;
+    E->data[2][1]=3;
+    E->data[2][2]=8;
+    print_matrix(E);
+    
+
+    // should print 6, 22, 38
+    printf("is magic? %i\n",is_magic_square(E));
     return 0;
 }
